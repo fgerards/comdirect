@@ -118,11 +118,11 @@ async function runOAuthFlow(reference, challengeUrl, username, password, tan) {
 	if (validationResponse.headers['x-once-authentication-info'] != null) {
 		const header = JSON.parse(validationResponse.headers['x-once-authentication-info'])
 		if (DEBUG) console.log('x-once-authentication-info', header)
-		if (header.id != null && header.typ == 'P_TAN' && header.challenge != null) {
-			reference.challenge = header.challenge
-			console.log(`Please solve the photoTAN with your browser: ${challengeUrl}`)
-			const _tan = await tan()
-			const activatedSession = await activateSesssionTAN(_tan, header.id, sessionStatus[0].identifier)
+		if (header.id != null && header.typ == 'P_TAN_PUSH') {
+			const freigegeben = utils.getInput('Bitte bestätigen Sie die TAN in Ihrer PhotoTAN App und drücken Sie <ENTER>');
+			if (freigegeben) {
+				const activatedSession = await activateSesssionTAN(_tan, header.id, sessionStatus[0].identifier)
+			}
 			if (activatedSession.sessionTanActive === true) {
 				const finalRespone = await oAuthSecondaryFlow()
 				return Object.assign({}, load(), {kdnr: finalRespone.kdnr} )
